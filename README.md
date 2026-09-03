@@ -4,7 +4,8 @@ A lightweight Google-Docs-style collaborative editor. FastAPI backend (SQLite
 locally, Postgres in production), React + Vite + Tiptap frontend. Built for
 the Ajaia AI-Native Full Stack Developer Assessment.
 
-**Live demo:** frontend — _TODO: Vercel URL_ · backend — _TODO: Vercel URL_
+**Live demo:** [google-docx-fya6.vercel.app](https://google-docx-fya6.vercel.app)
+(backend: [google-docx-1mmy.vercel.app](https://google-docx-1mmy.vercel.app))
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for design decisions and tradeoffs,
 [AI_WORKFLOW.md](AI_WORKFLOW.md) for how AI was used, and

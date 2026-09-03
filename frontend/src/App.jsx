@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import Editor from "./Editor";
+import Landing from "./Landing";
 import { api } from "./api";
 import "./App.css";
 
@@ -34,6 +35,7 @@ function Icon({ name, className = "" }) {
 }
 
 export default function App() {
+  const [showLanding, setShowLanding] = useState(true);
   const [users, setUsers] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [documents, setDocuments] = useState([]);
@@ -210,6 +212,10 @@ export default function App() {
         <div className="spinner" />
       </div>
     );
+  }
+
+  if (showLanding) {
+    return <Landing onContinue={() => setShowLanding(false)} />;
   }
 
   return (

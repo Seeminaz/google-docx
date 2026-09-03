@@ -51,8 +51,16 @@ export default function App() {
   const [deleting, setDeleting] = useState(false);
   const fileInputRef = useRef(null);
   const saveTimeout = useRef(null);
+  const pendingSave = useRef({});
   const titleRef = useRef(null);
   const currentUser = users.find((u) => u.id === currentUserId);
+
+  const resetSaveState = () => {
+    clearTimeout(saveTimeout.current);
+    pendingSave.current = {};
+    setSaveStatus("saved");
+    setLastSavedAt(null);
+  };
 
   useEffect(() => {
     const id = setInterval(() => setTick((t) => t + 1), 1000);
@@ -90,9 +98,8 @@ export default function App() {
     api
       .getDocument(doc.id, currentUserId)
       .then((full) => {
+        resetSaveState();
         setActiveDoc(full);
-        setSaveStatus("saved");
-        setLastSavedAt(null);
       })
       .catch((e) => setError(e.message));
   };
@@ -101,21 +108,26 @@ export default function App() {
     api
       .createDocument(currentUserId)
       .then((doc) => {
+        resetSaveState();
         setDocuments((prev) => [doc, ...prev]);
         setActiveDoc(doc);
-        setSaveStatus("saved");
-        setLastSavedAt(null);
       })
       .catch((e) => setError(e.message));
   };
 
   const scheduleSave = useCallback(
     (docId, payload) => {
+      // Merge into whatever's still pending rather than replacing it, so a
+      // content edit followed quickly by a title edit (or vice versa) within
+      // the debounce window doesn't drop the earlier change.
+      pendingSave.current = { ...pendingSave.current, ...payload };
       setSaveStatus("saving");
       clearTimeout(saveTimeout.current);
       saveTimeout.current = setTimeout(() => {
+        const toSave = pendingSave.current;
+        pendingSave.current = {};
         api
-          .updateDocument(docId, currentUserId, payload)
+          .updateDocument(docId, currentUserId, toSave)
           .then((updated) => {
             setSaveStatus("saved");
             setLastSavedAt(Date.now());
@@ -154,10 +166,9 @@ export default function App() {
     api
       .uploadDocument(currentUserId, file)
       .then((doc) => {
+        resetSaveState();
         setDocuments((prev) => [doc, ...prev]);
         setActiveDoc(doc);
-        setSaveStatus("saved");
-        setLastSavedAt(null);
       })
       .catch((err) => setError(err.message));
   };
@@ -165,6 +176,7 @@ export default function App() {
   const submitDelete = () => {
     if (!activeDoc) return;
     clearTimeout(saveTimeout.current);
+    pendingSave.current = {};
     setDeleting(true);
     setDeleteError(null);
     api

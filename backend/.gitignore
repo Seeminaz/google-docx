@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+docs.db
+test_docs.db
+.pytest_cache/
+.venv/
+venv/

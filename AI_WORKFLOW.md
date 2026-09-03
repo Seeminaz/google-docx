@@ -28,6 +28,16 @@ firsthand.
   refresh) rather than reasoning about the code in the abstract. Several of
   the bugs below only exist as failure modes in the *rendered* app — they
   would not show up from reading the source.
+- **Debugging the live deploy from logs alone.** When the Vercel deployment
+  crashed, I couldn't reproduce it locally the same way — I had the user
+  paste the actual runtime traceback rather than guessing from symptoms.
+  That immediately isolated it to `sqlite3.OperationalError: unable to open
+  database file`, i.e. `DATABASE_URL` wasn't reaching the function, not a
+  code bug. It also caught a live-only issue no local test surfaced: the
+  autosave handler replaced its pending payload instead of merging it, so a
+  content edit followed quickly by a title rename silently dropped the
+  content — found by testing the actual production build end-to-end, not
+  by re-running the local suite.
 
 ## What AI output was changed or rejected
 
@@ -53,14 +63,18 @@ firsthand.
 ## How correctness was verified
 
 - Backend: the existing 9-test `pytest` suite, re-run after every backend
-  touch (none were needed — the backend was untouched this session beyond
-  a database reset for clean test data).
+  touch, including the SQLite → Postgres change (`database.py` now reads
+  `DATABASE_URL` with a SQLite fallback — verified against a real Neon
+  Postgres instance directly, not just the local test suite, since the
+  test suite's dependency override bypasses whichever driver is configured).
 - Frontend: no unit tests were added for the editor specifically (out of
   scope for the time available — see `SUBMISSION.md`), but every fix was
   verified against the *running* app via Playwright: full create → format →
   autosave → upload → share → cross-user access-control → refresh flow,
-  re-run after each change, plus targeted isolation scripts for the two
-  data-integrity bugs (content corruption, spurious autosave) with
-  before/after HTML diffs proving the fix.
+  re-run after each change, plus targeted isolation scripts for the
+  data-integrity bugs (content corruption, spurious autosave, the autosave
+  payload-merge bug above) with before/after HTML diffs proving the fix —
+  and the full flow was re-run one final time against the live production
+  URLs, not just locally, before calling it done.
 - `npm run build` and `npm run lint` (oxlint) run clean as a final gate
   before deploy.

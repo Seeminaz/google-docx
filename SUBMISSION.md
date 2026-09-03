@@ -10,6 +10,7 @@
 
 ## What's working end-to-end (verified live in a browser, not just tested in isolation)
 
+- A short landing screen with one clear entry point into the editor
 - Create, rename, and delete documents (delete requires confirmation)
 - Rich-text editing: bold, italic, underline, H1/H2/H3, paragraph, bullet
   and numbered lists — all with keyboard shortcuts and visible hints

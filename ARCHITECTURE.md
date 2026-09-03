@@ -64,6 +64,14 @@ loses more than ~600ms of typing. Cost: every keystroke schedules a timer,
 so rapid edits mean the save status flickers between "Saving…" and "Saved"
 more than a longer debounce would — acceptable for a doc-sized editor.
 
+**A short landing screen before the editor.** Added late, after visual
+design feedback — a single honest hero screen (what the app does, one CTA
+into the editor) rather than the fuller "workspace dashboard" concept it was
+modeled on. Skipped from that reference on purpose: simulated collaborator
+presence, version numbers, and comments UI, since none of those are real
+features here, and shipping fake versions of them would misrepresent what's
+actually built.
+
 **Sharing is binary (view+edit), not role-based.** The schema (`Share` as a
 plain join table) only tracks *who* has access, not *what level*. Adding a
 `role` column and branching the UI on it was scoped out — see
@@ -100,6 +108,13 @@ all now fixed:
    in-flight stale save). Fixed by comparing emitted HTML against the
    editor's initial content and skipping the no-op, and by cancelling any
    pending save timer when a document is deleted.
+5. **Autosave dropping edits under rapid content+title changes.** Found
+   only once testing the actual live deployment: `scheduleSave` replaced
+   its pending save payload on every call instead of merging it, so typing
+   content and then quickly renaming the title within the 600ms debounce
+   window silently dropped the content — it stayed visible in the UI but
+   was never sent to the server. Fixed by merging into a pending-payload
+   ref instead of overwriting it.
 
 ## What I'd do with more time
 

@@ -2,10 +2,11 @@
 
 ## What's included
 
-- FastAPI + SQLAlchemy + SQLite backend, 9 automated tests, all passing
+- FastAPI + SQLAlchemy backend (SQLite dev / Postgres prod), 9 automated
+  tests, all passing
 - React + Vite + Tiptap frontend, builds clean, lints clean
 - `README.md`, `ARCHITECTURE.md`, `AI_WORKFLOW.md` (this file's siblings)
-- Live deploy: frontend on Vercel, backend on Render (links in `README.md`)
+- Live deploy: frontend and backend both on Vercel (links in `README.md`)
 
 ## What's working end-to-end (verified live in a browser, not just tested in isolation)
 
@@ -51,14 +52,14 @@
 
 ## What I'd build next with 2–4 more hours
 
-1. **Postgres instead of SQLite for the deployed backend** — removes the
-   free-tier persistent-disk limitation described in `ARCHITECTURE.md`, so
-   the live demo doesn't lose data between visits.
-2. **View-only share role** — the highest-value gap given the editor
+1. **View-only share role** — the highest-value gap given the editor
    already has an unused read-only mode ready to wire up.
-3. **Version history** — append-only revision log with a simple "restore
+2. **Version history** — append-only revision log with a simple "restore
    this version" action; the most tractable of the two stretch goals the
    assignment names, and the schema change is small.
-4. **A frontend test** (Vitest + React Testing Library) covering the
+3. **A frontend test** (Vitest + React Testing Library) covering the
    autosave debounce and the delete-confirmation flow, to complement the
    backend suite with something that exercises actual UI behavior.
+4. **Database migrations** (Alembic) — right now Postgres and SQLite both
+   rely on `create_all` at startup, fine for the current 3-table schema but
+   not a real migration story for a schema that will keep changing.

@@ -34,13 +34,23 @@ editing experience, which is what's graded. The tradeoff: any client can
 claim to be any user by passing a different `user_id` — fine for a take-home
 demo, not fine for production.
 
-**SQLite, not Postgres.** Zero setup, ships as a single file, and the data
-model (3 tables, no complex queries) doesn't need more. The real cost shows
-up in deployment: Render's free tier has no persistent disk, so the SQLite
-file resets when the service spins down from inactivity. A production
-version would use Postgres (Render's free Postgres tier would have solved
-this too) — deferred because it adds a second service to configure and
-wasn't worth the setup time for a demo that's mainly evaluated live.
+**SQLite for local dev, Postgres (Neon) in production.** SQLite is zero-setup
+and ships as a single file, which is all local development needs — the data
+model (3 tables, no complex queries) doesn't ask for more. The deployed
+backend runs as a Vercel serverless function, though, which has no
+persistent disk: a SQLite file would reset on every cold start. `database.py`
+reads a `DATABASE_URL` env var and falls back to SQLite when it's unset, so
+the same code runs against Neon's free Postgres in production without any
+per-environment branching in the application logic.
+
+**Vercel over Render for the backend, and Vercel Python serverless functions
+specifically.** The original plan was Render (a normal long-running
+container, simpler mental model for a stateful app). Render's free tier
+started requiring card verification partway through this build, which
+conflicts with the assignment's "simulate everything, no real payment info"
+spirit. Vercel was already connected for the frontend and needs no card, so
+the backend moved there too — as Python serverless functions rather than a
+persistent process, which is what pushed the SQLite → Postgres move above.
 
 **Tiptap over a from-scratch contentEditable.** Tiptap (ProseMirror) handles
 the hard parts of rich-text editing — schema-consistent documents, undo/redo,
@@ -94,7 +104,6 @@ all now fixed:
 ## What I'd do with more time
 
 See [SUBMISSION.md](SUBMISSION.md) for the full list — the short version is
-Postgres instead of SQLite for deploy durability, granular share roles
-(view vs. edit), and either version history or real-time collaboration
-indicators (the two stretch goals the assignment itself flags as the most
-tractable given the existing schema).
+granular share roles (view vs. edit) and either version history or
+real-time collaboration indicators (the two stretch goals the assignment
+itself flags as the most tractable given the existing schema).

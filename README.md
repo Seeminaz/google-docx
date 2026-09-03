@@ -1,10 +1,10 @@
 # Ajaia Docs
 
-A lightweight Google-Docs-style collaborative editor. FastAPI + SQLite backend,
-React + Vite + Tiptap frontend. Built for the Ajaia AI-Native Full Stack
-Developer Assessment.
+A lightweight Google-Docs-style collaborative editor. FastAPI backend (SQLite
+locally, Postgres in production), React + Vite + Tiptap frontend. Built for
+the Ajaia AI-Native Full Stack Developer Assessment.
 
-**Live demo:** frontend — _TODO: Vercel URL_ · backend — _TODO: Render URL_
+**Live demo:** frontend — _TODO: Vercel URL_ · backend — _TODO: Vercel URL_
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for design decisions and tradeoffs,
 [AI_WORKFLOW.md](AI_WORKFLOW.md) for how AI was used, and
@@ -23,7 +23,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for design decisions and tradeoffs,
 
 ## Stack
 
-- **Backend:** Python, FastAPI, SQLAlchemy, SQLite
+- **Backend:** Python, FastAPI, SQLAlchemy, SQLite (dev) / Postgres (prod)
 - **Frontend:** React, Vite, Tiptap
 
 ## Run it locally
@@ -69,17 +69,19 @@ and file upload (including unsupported-extension rejection).
 
 ## Deploying
 
-- **Backend → Render:** the repo includes `render.yaml`. In Render, New →
-  Blueprint → point at this repo. It builds `backend/` with
-  `pip install -r requirements.txt` and runs
-  `uvicorn main:app --host 0.0.0.0 --port $PORT`.
-- **Frontend → Vercel:** set the project's Root Directory to `frontend`,
-  and set the `VITE_API_BASE_URL` environment variable to the deployed
-  backend's URL.
+Both halves deploy to Vercel, as two separate projects pointing at the same
+GitHub repo (no card required on either platform):
 
-Note: Render's free tier has no persistent disk, so the SQLite file resets
-when the service spins down from inactivity. See ARCHITECTURE.md for why
-this tradeoff was accepted.
+- **Backend → Vercel (Python serverless):** new Vercel project, Root
+  Directory = `backend`. It picks up `backend/vercel.json`, which runs
+  `main.py` as an ASGI function. Set a `DATABASE_URL` environment variable
+  to a Postgres connection string (a free [Neon](https://neon.tech) project
+  works well — no card needed) — the backend falls back to a local SQLite
+  file when `DATABASE_URL` isn't set, so local dev needs no extra setup.
+- **Frontend → Vercel:** new Vercel project, Root Directory = `frontend`.
+  Set `VITE_API_BASE_URL` to the backend project's URL.
+
+See ARCHITECTURE.md for why Postgres (not SQLite) is used in production.
 
 ## Known limitations
 

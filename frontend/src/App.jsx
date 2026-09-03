@@ -23,6 +23,16 @@ function savedAgoLabel(savedAtMs) {
   return "Saved";
 }
 
+function initials(name) {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/);
+  return ((parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "")).toUpperCase();
+}
+
+function Icon({ name, className = "" }) {
+  return <span className={`material-symbols-outlined ${className}`}>{name}</span>;
+}
+
 export default function App() {
   const [users, setUsers] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -42,6 +52,7 @@ export default function App() {
   const fileInputRef = useRef(null);
   const saveTimeout = useRef(null);
   const titleRef = useRef(null);
+  const currentUser = users.find((u) => u.id === currentUserId);
 
   useEffect(() => {
     const id = setInterval(() => setTick((t) => t + 1), 1000);
@@ -192,12 +203,18 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <div className="brand">📄 Ajaia Docs</div>
+        <div className="brand">
+          <span className="brand-icon">
+            <Icon name="description" />
+          </span>
+          Ajaia Docs
+        </div>
         <div className="user-switcher">
-          <label>Signed in as</label>
+          <span className="user-avatar">{initials(currentUser?.name)}</span>
           <select
             value={currentUserId ?? ""}
             onChange={(e) => setCurrentUserId(Number(e.target.value))}
+            aria-label="Signed in as"
           >
             {users.map((u) => (
               <option key={u.id} value={u.id}>
@@ -218,10 +235,12 @@ export default function App() {
         <aside className="sidebar">
           <div className="sidebar-actions">
             <button className="primary-btn" onClick={createDocument}>
-              + New Document
+              <Icon name="add" className="btn-icon" />
+              New Document
             </button>
             <button className="secondary-btn" onClick={handleUploadClick}>
-              ⇧ Upload .txt / .md
+              <Icon name="upload_file" className="btn-icon" />
+              Upload .txt / .md
             </button>
             <input
               ref={fileInputRef}
@@ -236,11 +255,7 @@ export default function App() {
           <div className="doc-list">
             {documents.length === 0 && (
               <div className="empty-state">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
-                  <path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" strokeLinejoin="round" />
-                  <path d="M14 3v4h4" strokeLinejoin="round" />
-                  <path d="M9 12h6M9 15.5h6M9 8.5h2" strokeLinecap="round" />
-                </svg>
+                <Icon name="description" />
                 <p>No documents yet</p>
                 <span>Create one or upload a file to get started.</span>
               </div>
@@ -267,11 +282,7 @@ export default function App() {
           {!activeDoc ? (
             <div className="center-msg">
               <div className="no-doc-illustration">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-                  <path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" strokeLinejoin="round" />
-                  <path d="M14 3v4h4" strokeLinejoin="round" />
-                  <path d="M9 12h6M9 15.5h4M9 8.5h2" strokeLinecap="round" />
-                </svg>
+                <Icon name="description" />
                 <p>Select or create a document to get started</p>
               </div>
             </div>
@@ -292,8 +303,18 @@ export default function App() {
                         <span className="save-dot" /> Saving…
                       </>
                     )}
-                    {saveStatus === "error" && "Save failed"}
-                    {saveStatus === "saved" && savedAgoLabel(lastSavedAt)}
+                    {saveStatus === "error" && (
+                      <>
+                        <Icon name="error" />
+                        Save failed
+                      </>
+                    )}
+                    {saveStatus === "saved" && (
+                      <>
+                        <Icon name="cloud_done" />
+                        {savedAgoLabel(lastSavedAt)}
+                      </>
+                    )}
                   </span>
                   {activeDoc.is_owner && (
                     <button className="secondary-btn" onClick={() => setShareOpen(true)}>
@@ -309,9 +330,7 @@ export default function App() {
                         setDeleteOpen(true);
                       }}
                     >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                        <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0-.8 12.1a2 2 0 0 1-2 1.9H9.8a2 2 0 0 1-2-1.9L7 7" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
+                      <Icon name="delete" />
                     </button>
                   )}
                 </div>

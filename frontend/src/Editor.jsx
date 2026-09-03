@@ -57,7 +57,7 @@ export default function Editor({ content, editable, onChange }) {
             active={editor.isActive("bold")}
             onClick={() => editor.chain().focus().toggleBold().run()}
           >
-            <b>B</b>
+            <span className="material-symbols-outlined">format_bold</span>
           </ToolbarButton>
           <ToolbarButton
             title="Italic"
@@ -65,7 +65,7 @@ export default function Editor({ content, editable, onChange }) {
             active={editor.isActive("italic")}
             onClick={() => editor.chain().focus().toggleItalic().run()}
           >
-            <i>I</i>
+            <span className="material-symbols-outlined">format_italic</span>
           </ToolbarButton>
           <ToolbarButton
             title="Underline"
@@ -73,7 +73,7 @@ export default function Editor({ content, editable, onChange }) {
             active={editor.isActive("underline")}
             onClick={() => editor.chain().focus().toggleUnderline().run()}
           >
-            <u>U</u>
+            <span className="material-symbols-outlined">format_underlined</span>
           </ToolbarButton>
           <span className="toolbar-divider" />
           <ToolbarButton
@@ -106,7 +106,7 @@ export default function Editor({ content, editable, onChange }) {
             active={editor.isActive("bulletList")}
             onClick={() => editor.chain().focus().toggleBulletList().run()}
           >
-            • List
+            <span className="material-symbols-outlined">format_list_bulleted</span>
           </ToolbarButton>
           <ToolbarButton
             title="Numbered list"
@@ -114,7 +114,7 @@ export default function Editor({ content, editable, onChange }) {
             active={editor.isActive("orderedList")}
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
           >
-            1. List
+            <span className="material-symbols-outlined">format_list_numbered</span>
           </ToolbarButton>
         </div>
       )}
